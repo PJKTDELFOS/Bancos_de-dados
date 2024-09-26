@@ -44,17 +44,23 @@ def ver_dados():
             conn.close()
             return usuario
 
+def verificar_usuarios(id):
+    conn = conectar()
+    cursor = conn.cursor()
+    cursor.execute('select 1 from usuarios where id = ?', (id,))
+    resultado=cursor.fetchone()
+    conn.close()
+    return resultado is not None
 
 
 def atualizar_usuarios(id,novo_nome,nova_idade,novo_telefone,novo_endereco,novo_cargo,novo_salario):
     conn = conectar()
     cursor = conn.cursor()
     cursor.execute(
-        ' update usuarios set nome = ?, idade = ?, telefone = ?, endereco = ?, cargo = ?, '
-        'salario = ? where id = ?',( novo_nome,nova_idade,
-                                                novo_telefone,novo_endereco,
-                                                novo_cargo,novo_salario,id)
-    )
+            ' update usuarios set nome = ?, idade = ?, telefone = ?, endereco = ?, cargo = ?, '
+            'salario = ? where id = ?',( novo_nome,nova_idade,
+                                                    novo_telefone,novo_endereco,
+                                                    novo_cargo,novo_salario,id))
     conn.commit()
     conn.close()
 def deletar_usuario(id):
@@ -116,19 +122,21 @@ def menu():
         elif opcao=='4':
             while True:
                 id=int(input("digite o id do usuario a ser modificado:"))
-                novo_nome=input('digite nome atual: ')
-                nova_idade=int(input("digite a idade atualizada:"))
-                novo_telefone=input('digite telefone atual: ')
-                novo_endereco=input('digite endereço atual: ')
-                novo_cargo=input('digite cargo atual: ')
-                novo_salario=float(input("digite o salario atualizadodo funcionario: "))
-                atualizar_usuarios(id,novo_nome,nova_idade,novo_telefone, novo_endereco, novo_cargo, novo_salario)
-                print(f"Usuário {id} atualizado com sucesso.")
-                continuar = input('deseja continuar adicionando:').strip().lower()
-                if continuar == 's':
-                    continue
+                if verificar_usuarios(id):
+                    novo_nome=input('digite nome atual: ')
+                    nova_idade=int(input("digite a idade atualizada:"))
+                    novo_telefone=input('digite telefone atual: ')
+                    novo_endereco=input('digite endereço atual: ')
+                    novo_cargo=input('digite cargo atual: ')
+                    novo_salario=float(input("digite o salario atualizadodo funcionario: "))
+                    atualizar_usuarios(id,novo_nome,nova_idade,novo_telefone, novo_endereco, novo_cargo, novo_salario)
+                    continuar = input('deseja continuar adicionando:').strip().lower()
+                    if continuar == 's':
+                        continue
+                    else:
+                        break
                 else:
-                    break
+                    print('usuario nao localizado')
         elif opcao=='5':
             id=int(input('digite o id do usuario a ser deletato: '))
             deletar_usuario(id)
